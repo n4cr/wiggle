@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+    <script src="https://raw.github.com/cowboy/jquery-hashchange/v1.3/jquery.ba-hashchange.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
+
+    <script type="text/javascript" src="http://paperjs.org/static/js/paper.js?1320949252000"></script>
+
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css">
+    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
+
+    <style type="text/css">
+        body {
+            color:white;
+        }
+        .slider {
+          width:200px;
+        }
+        .sliders div {
+            margin: 10px;
+        }
+    </style>
+
+</head>
+<body style="background-color:black">
+
+    <script type="text/paperscript" canvas="myCanvas">
+      var force = 1.5;
+      var speed = 10;
+var MyPoint = Base.extend({
+    initialize: function(x,y, wiggle){
+        this.point = new Point(x, y)
+        this.wiggle = wiggle;
+
+        this.x = x;
+        this.y = y;
+        this.name='noname';
+        var c = new Path.Circle(this.point, 4);
+        c.fillColor = 'white';
+        this.circle = c;
+    }, 
+
+    remove: function(){
+        this.circle.remove();
+    }
+
+});
+
+// var Particle = Group.extend({
+//     initialize: function(point){
+//         this.point = point
+//         var radius = Math.floor((Math.random()*40)+5);
+//         var c = new Path.Circle(this.point, radius);
+//         var alpha=Math.random();
+//         this.setColor(c, radius);
+//         this.circle = c;
+
+//     }, 
+//     remove: function(){
+//         this.circle.remove();
+//     },
+
+//     setColor: function(c,r){
+//         var col1 = new RgbColor(255,255,255,1);
+//         col1.alpha = 0.3;
+//         var col2 = col1.clone();
+//         col2.alpha= 0.2;
+//         var col3 = new RgbColor(0,0,0,0);
+
+//         var stops = [[col1,0],[col2,0.3], [col3, 1]];
+
+//         // Create a radial gradient using the color stops array:
+//         var gradient = new Gradient(stops, 'radial');
+
+//         // We will use the center point of the circle shaped path as
+//         // the origin point for our gradient color
+//         var from = c.position;
+
+//         // The destination point of the gradient color will be the
+//         // center point of the path + 80pt in horizontal direction:
+//         var to = c.position + [r, 0];
+
+//         // Create the gradient color:
+//         var gradientColor = new GradientColor(gradient, from, to);
+//         c.fillColor = gradientColor;
+//     }
+// });
+
+
+var MyPath = Base.extend({
+    initialize: function(stroke){
+        this.points = [];
+        this.path = new Path()
+        this.path.strokeColor = 'white';
+        this.path.strokeWidth = stroke;
+
+    },
+    remove: function(){
+        this.path.remove();
+        $.each(this.points, function(i, p){
+            p.remove();
+        });
+    },
+    
+    addPoint: function(mypoint){
+        this.points.push(mypoint);
+        this.path.add(mypoint.point);
+    }
+    ,
+    setColor: function(){
+        // Gradient testing
+        var red = new RgbColor(255,0,0,1);
+        var red2 = new RgbColor(255,0,0,0.5);
+        var red3 = new RgbColor(255,0,0,0.2);
+        var stops = [[red, 0.15], [red2, 0.5], [red3, 0.9]];
+        // Create a radial gradient using the color stops array:
+        var gradient = new Gradient(stops, 'radial');
+        var gradientColor = new GradientColor(gradient, this.path.segments[0].point, this.path.segments[this.path.segments.length-1].point);
+        this.path.strokeColor = gradientColor;
+
+    },
+
+
+
+});
+
+var Letter = Group.extend({
+
+    data : {
+
+        'a' : {
+            'points':{ 'p1':[0,25], 'p2':[15,0], 'p3':[45,0], 'p4':[60,25], 'p5':[45,50], 'p6':[15,50], 'p7':[60,0], 'p8':[60,50]  },
+            'paths' : [['p1','p2', 'p3', 'p4','p5', 'p6', 'p1'], ['p1','p3', 'p5', 'p2','p4', 'p6', 'p2','p1', 'p5', 'p6', 'p3','p4','p1'],['p7','p4','p8']],
+            'strokes': [3, 0.5, 3],
+            'width'    : 90,
+        },
+
+        'b' : {
+            'points':{ 'p1':[0,-50], 'p2':[0,0], 'p3':[0,50], 'p4':[30,50], 'p5':[45,25], 'p6':[30,0]},
+            'paths' : [['p1','p2', 'p2', 'p3', 'p4', 'p5', 'p6', 'p2' ],['p2', 'p4', 'p6', 'p3', 'p5', 'p2']],
+            'strokes': [3, 0.5],
+            'width'    : 60,
+        },
+
+        'c' : {
+            'points':{ 'p1':[45,0], 'p2':[15,0], 'p3':[0,25], 'p4':[15,50], 'p5':[45,50]},
+            'paths' : [['p1','p2', 'p3', 'p4', 'p5' ],['p1','p4','p5','p2']],
+            'strokes': [3, 0.5],
+            'width'    : 60,
+        },
+
+        'd' : {
+            'points':{ 'p1':[45,-50], 'p2':[45,0], 'p3':[45,50], 'p4':[15,50], 'p5':[0,25], 'p6':[15,0]},
+            'paths' : [['p1','p2', 'p3', 'p4', 'p5', 'p6', 'p2' ],['p2', 'p4', 'p6', 'p3', 'p5', 'p2']],
+            'strokes': [3, 0.5],
+            'width'    : 80,
+        },
+
+        'e' : { 
+            'points':{ 'p1':[0,25], 'p2':[60,25],'p3':[45, 0],'p4':[15, 0],'p5':[15, 50],'p6':[45, 50]},
+            'paths' : [['p1','p2', 'p3', 'p4','p1', 'p5','p6'],['p6','p1','p3','p5','p4','p2']],
+            'strokes': [3, 0.5],
+            'width'    : 80
+            },
+
+        'f' : {
+            'points':{ 'p1':[0,-50], 'p2':[0,0], 'p3':[0,50], 'p4':[20,-50], 'p5':[20,0]},
+            'paths' : [['p1','p2','p3'],['p1','p4'],['p2','p5'],['p4','p2']],
+            'strokes': [3,3,3, 0.5],
+            'width'    : 30,
+        },
+
+
+        'g' : {
+            'points':{ 'p1':[45,50], 'p2':[15,50], 'p3':[0,25], 'p4':[15,0], 'p5':[45,0], 'p6':[45,50], 'p7':[45,100], 'p8':[15,100], 'p9':[0,80]},
+            'paths' : [['p1','p2','p3','p4','p5','p6','p7','p8','p9'],['p1','p4','p5','p2', 'p7','p9', 'p1']],
+            'strokes': [3,0.5],
+            'width'    : 70,
+        },
+        
+
+        'h' : {
+            'points':{ 'p1':[0,50], 'p2':[0,0], 'p3':[40,00], 'p4':[40,50], 'p5':[0,-50] },
+            'paths' : [['p1','p2','p3', 'p4'],['p5','p1'], ['p1','p3','p2','p4']],
+            'strokes': [3,3, 0.5],
+            'width'    : 60,
+        },
+
+        'i' : {
+            'points':{ 'p1':[0,-20], 'p2':[0,0], 'p3':[0,50]},
+            'paths' : [['p1','p2'], ['p2','p3']],
+            'strokes': [0.5,3],
+            'width'    : 20,
+        },
+
+        'j' : {
+            'points':{ 'p1':[15,0], 'p2':[15,50], 'p3':[15,100], 'p4':[0,100], 'p5':[15,-20]},
+            'paths' : [['p1','p2','p3','p4'],['p5','p1']],
+            'strokes': [3,0.5 ],
+            'width'    : 30,
+        },
+        
+
+        'l' : {
+            'points':{ 'p1':[0,-50], 'p2':[0,0], 'p3':[0,50]},
+            'paths' : [['p1','p2','p3']],
+            'strokes': [3],
+            'width'    : 30,
+        },
+
+
+        'm' : {
+            'points':{ 'p1':[0,50], 'p2':[0,0], 'p3':[40,00], 'p4':[40,50], 'p5':[80,0], 'p6':[80,50] },
+            'paths' : [['p1','p2','p3', 'p4'],['p3','p5','p6'], ['p1','p3','p2','p4', 'p5', 'p3', 'p6']],
+            'strokes': [3,3,0.5],
+            'width'    : 100,
+        },
+
+        'n' : {
+            'points':{ 'p1':[0,50], 'p2':[0,0], 'p3':[40,00], 'p4':[40,50] },
+            'paths' : [['p1','p2','p3', 'p4'], ['p1','p3','p2','p4']],
+            'strokes': [3,0.5],
+            'width'    : 60,
+        },
+        'o' : {
+            'points':{ 'p1':[0,25], 'p2':[15,0], 'p3':[45,0], 'p4':[60,25], 'p5':[45,50], 'p6':[15,50],  },
+            'paths' : [['p1','p2', 'p3', 'p4','p5', 'p6', 'p1'], ['p1','p3', 'p5', 'p2','p4', 'p6', 'p2','p1', 'p5', 'p6', 'p3','p4','p1']],
+            'strokes': [3, 0.5],
+            'width'    : 90,
+        },
+
+        'r' : {
+            'points':{ 'p1':[0,50], 'p2':[0,0], 'p3':[20,00] },
+            'paths' : [['p1','p2','p3'], ['p1','p3']],
+            'strokes': [3,0.5],
+            'width'    : 40,
+        },
+
+        's' : {
+            'points':{'p1':[40,0], 'p2':[0,0],'p3':[0,10], 'p4':[40,40], 'p5':[40,50], 'p6':[0,50] },
+            'paths' : [['p1','p2','p3', 'p4', 'p5', 'p6'], ['p1','p3'], ['p4','p6']],
+            'strokes': [3,0.5, 0.5],
+            'width'    : 60,
+        },        
+
+        'y' : {
+            'points':{'p1':[0,0], 'p2':[10,40],'p3':[20,50], 'p4':[30,40], 'p5':[40,00], 'p6':[20,100] },
+            'paths' : [['p1','p2','p3', 'p4', 'p5'], ['p3','p6'], ['p1','p4'], ['p2','p5']],
+            'strokes': [3,3, 0.5, 0.5],
+            'width'    : 60,
+        },        
+
+        
+        'z' : {
+            'points':{'p1':[0,0], 'p2':[40,00],'p3':[40,10], 'p4':[0,40], 'p5':[0,50], 'p6':[40,50] },
+            'paths' : [['p1','p2','p3', 'p4', 'p5', 'p6'], ['p1','p3'], ['p4','p6']],
+            'strokes': [3,0.3, 0.3],
+            'width'    : 60,
+        },        
+
+        '1' : {
+            'points':{'p1':[-15,-50], 'p2':[0,-50], 'p3':[0,0], 'p4':[0,50], 'p5':[-15,50], 'p6':[15,50]},
+            'paths' : [['p1','p2','p3', 'p4'],['p5','p4','p6']],
+            'strokes': [3, 3],
+            'width'    : 30,
+        },
+
+        '2' : {
+            'points':{ 'p1':[0,25], 'p2':[15,0], 'p3':[45,0], 'p4':[60,25], 'p5':[45,50], 'p6':[10,85], 'p7':[10,100], 'p8':[60,100] },
+            'paths' : [['p1','p2', 'p3', 'p4','p5', 'p6', 'p7','p8'], ['p1','p3', 'p5', 'p2','p4', 'p6', 'p2','p1', 'p5', 'p6', 'p3','p4','p1']],
+            'strokes': [3, 0.5],
+            'width'    : 60,
+        },
+
+    },
+
+    initialize: function(letter) {
+        this.points = this.data[letter].points;
+        this.wigs = new Object();
+        this.paths = this.data[letter].paths;
+        this.width = this.data[letter].width;
+        this.circles  = [];
+        this.lines  = [];
+        self = this;
+
+        self.position = new Point(0,0);
+
+        mypoints = new Object();
+        $.each(this.points, function(i, p){
+            var m1 = new MyPoint(self.position.x + p[0], self.position.y + p[1], Math.floor((Math.random()*100)+1));
+            m1.name = i
+            mypoints[i] = m1;
+
+            self.addCircle(m1);    
+        });
+
+        $.each(this.paths, function(j,path){
+            var mypath = new MyPath(self.data[letter].strokes[j]);
+            $.each(path, function(i,pname){
+                mypath.addPoint(mypoints[pname]);
+            });
+            self.addLine(mypath);
+        });
+
+
+
+    },
+    
+    addCircle: function(circle) {
+        this.circles.push(circle);
+    },
+
+    addLine: function(line) {
+        this.lines.push(line);
+    },
+
+    getPosition: function() {
+        return this.base();
+    },
+    
+    setPosition: function(val) {
+        this.base(val);
+    },
+
+    remove: function(){
+        $.each(this.circles, function(i, c){ c.remove();});
+        $.each(this.lines, function(i, l){ l.remove();});
+    },
+
+    wiggle : function(e){
+        var self = this;
+        var event = e;
+
+        posx = self.position.x;
+        posy = self.position.y;
+
+        $.each(self.circles, function(i, c){
+
+            var x = c.x;
+            var y = c.y;
+            
+            w = c.wiggle;
+
+
+            var sinus = Math.sin(event.time*speed + w);
+            var cos = Math.cos(event.time*speed + w);
+
+            s1= sinus * force + x;
+            s2= cos * force + y;
+
+            c.circle.position.x = posx +  s1;
+            c.circle.position.y = posy + s2;
+        });
+
+        $.each(self.lines , function(j, mypath){
+            segments = mypath.path.segments;
+            for (var i = 0; i < segments.length; i++) {
+                var x = mypath.points[i].point.x;
+                var y = mypath.points[i].point.y;
+                var w = mypath.points[i].wiggle;
+
+                var sinus = Math.sin(event.time*speed + w);
+                var cos = Math.cos(event.time*speed + w);
+
+                var s1= sinus * force + x;
+                var s2= cos * force + y;
+                segments[i].point.x = posx + s1;
+                segments[i].point.y = posy + s2;
+            }
+
+        });
+
+
+    }
+});
+
+Word  =  Group.extend({
+    initialize: function(word){
+        this.letters = []
+        var posx =this.position.x;
+        for (var i=0; i< word.length; i++){
+            c = word.charAt(i)
+            var letter = new Letter(c);
+            letter.position = new Point(posx, 200);
+            this.addChild(letter);
+            this.letters.push(letter);
+
+            posx += letter.width;
+        }
+    },
+    
+    setPosition: function(point){
+        var posx =point.x;
+        for (var i=0; i< this.letters.length; i++){
+            var letter = this.letters[i]
+            letter.position = new Point(posx, point.y);
+            
+            posx += letter.width;
+        }
+        
+    },
+
+    wiggle: function(event){
+        $.each(this.letters, function(i, letter){
+            letter.wiggle(event);
+        });
+    },
+
+    remove: function(){
+        this.base();
+        $.each(this.letters, function(i, l){
+            l.remove();
+        });
+    }
+});
+
+var words = [];
+var particles = [];
+
+var n = window.location.hash.replace('#','');
+
+
+var h= new Word(n);
+var nasir = new Word('nasir');
+nasir.setPosition(new Point(200,100));
+h.setPosition(new Point(400,200));
+words.push(nasir);
+words.push(h);
+
+
+$(window).hashchange( function(){
+// Alerts every time the hash changes!
+    h.remove();
+    n= location.hash.replace('#','');
+    h = new Word(n);
+    h.setPosition(new Point(600,200));
+    words.push(h);
+});
+
+$('#update').click(function(){
+    h.remove();
+    var word = $('#input').val();
+    var w = new Word(word);
+    w.setPosition(new Point(400,200));
+    words.push(w);
+});
+
+function onMouseUp(event) {
+    particle = new Particle(event.point);
+}
+
+function onFrame(event){
+
+$.each(words, function(i, word){
+    word.wiggle(event);
+});
+
+}
+
+var text = new PointText(view.center);
+text.paragraphStyle.justification = 'center';
+text.characterStyle.fontSize = 20;
+text.fillColor = 'white';
+text.position = new Point(100,100);
+
+$(document).ready(function(){
+    $( "#speed" ).slider(
+      { 
+        max: 50,
+        min: 0,
+        value: 10,
+        change: function(event, ui) {
+        },
+        slide: function(event, ui){
+          console.log(ui.value);
+          speed = ui.value;
+        }
+      }
+    );
+
+    $( "#force" ).slider(
+      { 
+        max: 10,
+        min: 0,
+        value: 1.5,
+        step:0.5,
+        change: function(event, ui) {
+        },
+        slide: function(event, ui){
+          console.log(ui.value);
+          force = ui.value;
+        }
+      }
+    );
+
+});
+</script>
+
+<script type="text/javascript">
+</script>
+<div class="container" style="text-align:center">    
+  <div>
+    <div>
+      <h1>Wiggle</h1>
+      <form class="form-inline">
+          <input id="input" type="text" placeholder="Type your name and press Show">
+          <a href="#" class="btn" id="update">Show</a>
+      </form>
+      <div class="sliders" style="width:230px; margin-left: auto; margin-right:auto">
+        <div>
+          Speed <div class="slider" id="speed"></div>
+        </div>
+        <div>
+          Force <div class="slider" id="force"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <canvas id="myCanvas" resize></canvas>
+</div>
+
+</body>
+</html>
