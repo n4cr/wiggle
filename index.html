@@ -20,6 +20,9 @@
         .sliders div {
             margin: 10px;
         }
+        .cnt {
+            width: 100%;
+        }
     </style>
 
 </head>
@@ -201,6 +204,12 @@ var Letter = Group.extend({
             'width'    : 30,
         },
         
+       'k' : {
+            'points':{ 'p1':[0,-50], 'p2':[0,0], 'p3':[0,50], 'p4':[30,0], 'p5':[45,50], 'p6':[15,25], 'p7':[0,30]},
+            'paths' : [['p1', 'p2', 'p7', 'p3'], ['p4', 'p6', 'p7','p6', 'p5']],
+            'strokes': [3, 3],
+            'width'    : 30,
+        },
 
         'l' : {
             'points':{ 'p1':[0,-50], 'p2':[0,0], 'p3':[0,50]},
@@ -230,6 +239,20 @@ var Letter = Group.extend({
             'width'    : 90,
         },
 
+        'p' : {
+            'points':{ 'p1':[0,100], 'p2':[0,50], 'p3':[0,0], 'p4':[30,0], 'p5':[45,25], 'p6':[30,50]},
+            'paths' : [['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p2' ],['p2', 'p4', 'p6', 'p3', 'p5', 'p2']],
+            'strokes': [3, 0.5],
+            'width'    : 60,
+        },
+
+        'q' : {
+            'points':{ 'p1':[45,100], 'p2':[45,50], 'p3':[45,0], 'p4':[15,0], 'p5':[0,25], 'p6':[15,50]},
+            'paths' : [['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p2' ],['p2', 'p4', 'p6', 'p3', 'p5', 'p2']],
+            'strokes': [3, 0.5],
+            'width'    : 60,
+        },
+
         'r' : {
             'points':{ 'p1':[0,50], 'p2':[0,0], 'p3':[20,00] },
             'paths' : [['p1','p2','p3'], ['p1','p3']],
@@ -243,6 +266,42 @@ var Letter = Group.extend({
             'strokes': [3,0.5, 0.5],
             'width'    : 60,
         },        
+
+        't' : {
+            'points':{ 'p1':[10,-50], 'p2':[10,0], 'p3':[10,50], 'p4':[0,0], 'p5':[20,0]},
+            'paths' : [['p1','p2','p3'],['p4','p2','p5'], ['p1','p4','p5','p3']],
+            'strokes': [3, 3, 0.5],
+            'width'    : 40,
+        },
+
+        'u' : {
+            'points':{ 'p1':[0,0], 'p2':[0,50], 'p3':[40,50], 'p4':[40,00] },
+            'paths' : [['p1','p2','p3', 'p4'], ['p1','p3','p2','p4']],
+            'strokes': [3,0.5],
+            'width'    : 60,
+        },
+
+        'v' : {
+            'points':{ 'p1':[0,0], 'p2':[20,50], 'p3':[40,0] },
+            'paths' : [['p1','p2','p3']],
+            'strokes': [3],
+            'width'    : 60,
+        },
+
+        'w' : {
+            'points':{ 'p1':[0,0], 'p2':[0,50], 'p3':[40,50], 'p4':[40,0], 'p5':[80,50], 'p6':[80,0] },
+            'paths' : [['p1','p2','p3', 'p4'],['p3','p5','p6'], ['p1','p3','p2','p4', 'p5', 'p3', 'p6']],
+            'strokes': [3,3,0.5],
+            'width'    : 100,
+        },
+
+        'x' : {
+            'points':{ 'p1':[0,0], 'p2':[20,25], 'p3':[40,50], 
+                        'p4':[40,0], 'p5':[0,50]},
+            'paths' : [['p1','p2','p3'],['p4','p2','p5']],
+            'strokes': [3, 3],
+            'width'    : 60,
+        },
 
         'y' : {
             'points':{'p1':[0,0], 'p2':[10,40],'p3':[20,50], 'p4':[30,40], 'p5':[40,00], 'p6':[20,100] },
@@ -258,6 +317,14 @@ var Letter = Group.extend({
             'strokes': [3,0.3, 0.3],
             'width'    : 60,
         },        
+
+        ' ' : {
+            'points':{},
+            'paths' : [],
+            'strokes': [],
+            'width'    : 40,
+        },        
+
 
         '1' : {
             'points':{'p1':[-15,-50], 'p2':[0,-50], 'p3':[0,0], 'p4':[0,50], 'p5':[-15,50], 'p6':[15,50]},
@@ -418,31 +485,20 @@ Word  =  Group.extend({
 var words = [];
 var particles = [];
 
-var n = window.location.hash.replace('#','');
+// var n = window.location.hash.replace('#','');
 
 
-var h= new Word(n);
-var nasir = new Word('nasir');
-nasir.setPosition(new Point(200,100));
-h.setPosition(new Point(400,200));
-words.push(nasir);
-words.push(h);
+ var h;
 
-
-$(window).hashchange( function(){
-// Alerts every time the hash changes!
-    h.remove();
-    n= location.hash.replace('#','');
-    h = new Word(n);
-    h.setPosition(new Point(600,200));
-    words.push(h);
-});
 
 $('#update').click(function(){
-    h.remove();
+    for(var i=0; i< words.length; i++){
+        words[i].remove();
+    }
+    words = [];
     var word = $('#input').val();
     var w = new Word(word);
-    w.setPosition(new Point(400,200));
+    w.setPosition(new Point(200,100));
     words.push(w);
 });
 
@@ -467,8 +523,9 @@ text.position = new Point(100,100);
 $(document).ready(function(){
     $( "#speed" ).slider(
       { 
-        max: 50,
+        max: 30,
         min: 0,
+        step:0.5,
         value: 10,
         change: function(event, ui) {
         },
@@ -499,25 +556,27 @@ $(document).ready(function(){
 
 <script type="text/javascript">
 </script>
-<div class="container" style="text-align:center">    
+<div class="container">
   <div>
     <div>
       <h1>Wiggle</h1>
-      <form class="form-inline">
+        <div class="input-append">
           <input id="input" type="text" placeholder="Type your name and press Show">
-          <a href="#" class="btn" id="update">Show</a>
-      </form>
-      <div class="sliders" style="width:230px; margin-left: auto; margin-right:auto">
-        <div>
-          Speed <div class="slider" id="speed"></div>
+            <button class="btn" type="button" id="update">Show!</button>
         </div>
+      <div class="sliders" style="width:230px;">
         <div>
           Force <div class="slider" id="force"></div>
+        </div>
+        <div>
+          Speed <div class="slider" id="speed"></div>
         </div>
       </div>
     </div>
   </div>
-  <canvas id="myCanvas" resize></canvas>
+  <div class="cnt">
+      <canvas id="myCanvas" resize></canvas>
+  </div>
 </div>
 
 </body>
