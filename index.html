@@ -477,7 +477,7 @@ $('#update').click(function(){
         words[i].remove();
     }
     words = [];
-    var w = new Word(word);
+    var w = new Word(word.toLowerCase());
     w.setPosition(new Point(30,100));
     words.push(w);
 });
