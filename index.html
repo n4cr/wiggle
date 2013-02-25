@@ -25,6 +25,20 @@
         }
     </style>
 
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38791134-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
 </head>
 <body style="background-color:black">
 
@@ -49,46 +63,6 @@ var MyPoint = Base.extend({
     }
 
 });
-
-// var Particle = Group.extend({
-//     initialize: function(point){
-//         this.point = point
-//         var radius = Math.floor((Math.random()*40)+5);
-//         var c = new Path.Circle(this.point, radius);
-//         var alpha=Math.random();
-//         this.setColor(c, radius);
-//         this.circle = c;
-
-//     }, 
-//     remove: function(){
-//         this.circle.remove();
-//     },
-
-//     setColor: function(c,r){
-//         var col1 = new RgbColor(255,255,255,1);
-//         col1.alpha = 0.3;
-//         var col2 = col1.clone();
-//         col2.alpha= 0.2;
-//         var col3 = new RgbColor(0,0,0,0);
-
-//         var stops = [[col1,0],[col2,0.3], [col3, 1]];
-
-//         // Create a radial gradient using the color stops array:
-//         var gradient = new Gradient(stops, 'radial');
-
-//         // We will use the center point of the circle shaped path as
-//         // the origin point for our gradient color
-//         var from = c.position;
-
-//         // The destination point of the gradient color will be the
-//         // center point of the path + 80pt in horizontal direction:
-//         var to = c.position + [r, 0];
-
-//         // Create the gradient color:
-//         var gradientColor = new GradientColor(gradient, from, to);
-//         c.fillColor = gradientColor;
-//     }
-// });
 
 
 var MyPath = Base.extend({
@@ -205,10 +179,10 @@ var Letter = Group.extend({
         },
         
        'k' : {
-            'points':{ 'p1':[0,-50], 'p2':[0,0], 'p3':[0,50], 'p4':[30,0], 'p5':[45,50], 'p6':[15,25], 'p7':[0,30]},
+            'points':{ 'p1':[0,-50], 'p2':[0,0], 'p3':[0,50], 'p4':[30,0], 'p5':[30,50], 'p6':[15,25], 'p7':[0,30]},
             'paths' : [['p1', 'p2', 'p7', 'p3'], ['p4', 'p6', 'p7','p6', 'p5']],
             'strokes': [3, 3],
-            'width'    : 30,
+            'width'    : 40,
         },
 
         'l' : {
@@ -488,17 +462,23 @@ var particles = [];
 // var n = window.location.hash.replace('#','');
 
 
- var h;
-
+ var h = 'type your name';
+ h = new Word(h);
+ h.setPosition(new Point(40, 100));
+ words.push(h);
 
 $('#update').click(function(){
+    var word = $('#input').val();
+    if ( /[^a-zA-Z ]/.test(word)){
+        alert('Only characters.');
+        return;
+    }
     for(var i=0; i< words.length; i++){
         words[i].remove();
     }
     words = [];
-    var word = $('#input').val();
     var w = new Word(word);
-    w.setPosition(new Point(200,100));
+    w.setPosition(new Point(30,100));
     words.push(w);
 });
 
@@ -560,8 +540,21 @@ $(document).ready(function(){
   <div>
     <div>
       <h1>Wiggle</h1>
+        <div class="pull-right">
+            <span>
+                <a href="https://twitter.com/share" class="twitter-share-button" data-via="n4Cr">Tweet</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+            </span>
+            <span>
+<iframe src="http://ghbtns.com/github-btn.html?user=nasir5959&repo=wiggle&type=fork"
+  allowtransparency="true" frameborder="0" scrolling="0" width="53" height="20"></iframe>
+            </span>
+            <span>
+
+            </span>
+        </div>
         <div class="input-append">
-          <input id="input" type="text" placeholder="Type your name and press Show">
+          <input id="input" type="text" placeholder="type your name">
             <button class="btn" type="button" id="update">Show!</button>
         </div>
       <div class="sliders" style="width:230px;">
